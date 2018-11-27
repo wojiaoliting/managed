@@ -78,6 +78,12 @@
             prop="mobile"
             label="电话">
         </el-table-column>
+         <el-table-column
+            align="center"
+            header-align="center"
+            prop="role_name"
+            label="角色权限">
+        </el-table-column>
         <el-table-column
             align="center"
             header-align="center"
@@ -103,6 +109,7 @@
         <el-table-column
             align="center"
             header-align="center"
+            width="200"
             label="操作">
          <template slot-scope="scope">
           <el-button
@@ -116,7 +123,7 @@
           <el-button
           size="mini"
           type="success"
-          @click="handleDelete(scope.$index, scope.row)"><i class="el-icon-check"></i></el-button>
+          @click="addRole(scope.row)"><i class="el-icon-check"></i></el-button>
          </template>
         </el-table-column>
         </el-table>
@@ -143,7 +150,29 @@
                   <el-button @click="editDialogVisible = false">取 消</el-button>
                   <el-button type="primary" @click="editUser">确 定</el-button>
                 </span>
-              </el-dialog>
+        </el-dialog>
+        <el-dialog
+                title="分配角色"
+                :visible.sync="roleDialogVisible"
+                width="40%"
+                :before-close="handleClose3">
+                <template slot-scope="scope">
+                  <div style="margin-bottom:10px">用户名：{{addForm.username}}</div>
+                  角色：
+                  <el-select v-model="value" placeholder="请选择">
+                    <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                </template>
+                <span slot="footer" class="dialog-footer">
+                  <el-button @click="roleDialogVisible = false">取 消</el-button>
+                  <el-button type="primary" @click="updateRole">确 定</el-button>
+                </span>
+        </el-dialog>
     <!-- 分页 -->
     <el-pagination
       @size-change="handleSizeChange"
@@ -170,6 +199,7 @@ export default {
       searchValue: '',
       dialogVisible: false,
       editDialogVisible: false,
+      roleDialogVisible: false,
       addForm: {
         username: '',
         password: '',
@@ -193,7 +223,24 @@ export default {
           { required: true, message: '请输入电话', trigger: 'blur' },
           { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'blur' }
         ]
-      }
+      },
+      options: [{
+        value: 30,
+        label: '主管'
+      }, {
+        value: 31,
+        label: '测试角色'
+      }, {
+        value: 34,
+        label: '测试角色2'
+      }, {
+        value: 39,
+        label: '超级管理员'
+      }, {
+        value: 10,
+        label: 'test'
+      }],
+      value: ''
     }
   },
   created () {
@@ -209,7 +256,7 @@ export default {
       if (status === 200) {
         this.tableData = res.data.data.users
         this.total = res.data.data.total
-        // console.log(res)
+        console.log(res)
       } else {
         this.$message.error(msg)
       }
@@ -254,6 +301,11 @@ export default {
     },
     handleClose2 () {
       this.editDialogVisible = false
+      this.handleClosEedit()
+    },
+    handleClose3 () {
+      this.roleDialogVisible = false
+      this.handleClosEedit()
     },
     async handleChangeStatus (user) {
       const res = await this.$axios.put(`users/${user.id}/state/${user.mg_state}`)
@@ -272,6 +324,12 @@ export default {
       this.addForm.email = user.email
       this.addForm.mobile = user.mobile
       this.addForm.id = user.id
+    },
+    addRole (user) {
+      this.roleDialogVisible = true
+      this.addForm.id = user.id
+      this.addForm.username = user.username
+      console.log(user)
     },
     async editUser () {
       const res = await this.$axios.put(`users/${this.addForm.id}`, {email: this.addForm.email, mobile: this.addForm.mobile})
@@ -301,7 +359,21 @@ export default {
           this.$message.error(msg)
         }
       }
+    },
+    async updateRole () {
+      console.log(this.value)
+      const res = await this.$axios.put(`users/${this.addForm.id}/role`, {rid: this.value})
+      const {meta: {status, msg}} = res.data
+      if (status === 200) {
+        this.$message.success(msg)
+        this.loadData()
+        this.roleDialogVisible = false
+        this.handleClosEedit()
+      } else {
+        this.$message.error(msg)
+      }
     }
+
   }
 }
 </script>
