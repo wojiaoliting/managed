@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <ul>
+        <router-link to='/home' tag='li'><a>首页</a></router-link>
+        <router-link to='/news' tag='li'><a>音乐</a></router-link>
+        <router-link to='/music' tag='li'><a>新闻</a></router-link>
+        </ul>
+        <router-view></router-view>
+    </div>
+    <script src="../node_modules/vue/dist/vue.js"></script>
+    <script src="../node_modules/vue-router/dist/vue-router.js"></script>
+    <script>
+        var home={
+            template:`<div>a</div>`
+        }
+        var news={
+            template:`<div>b</div>`
+        }
+        var music={
+            template:`<div>c</div>`
+        }
+        var routes=[
+            {name:'home',path:'/home',component:home},
+            {name:'news',path:'/news',component:news},
+            {name:'music',path:'/music',component:music}
+        ]
+        var router=new VueRouter({
+            routes
+        })
+        new Vue({
+            el:'#app',
+            router,
+            components:{
+                home,
+                news,
+                music
+            }
+        })
+    </script>
+</body>
+</html>
